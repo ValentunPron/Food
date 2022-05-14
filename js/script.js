@@ -34,12 +34,30 @@ window.addEventListener('DOMContentLoaded', () => {
 			});
 		}
 	});
+	//Tabs 2.0
 
+	const slideContent = document.querySelectorAll(".offer__slide"),
+	      slideParent = document.querySelector('.offer__slider-wrapper'),
+	      nextSlide = document.querySelector('.offer__slider-next'),
+		  prevSlide = document.querySelector('.offer__slider-prev');
+
+		  function hideAllSlide() {
+			  slideContent.forEach(item => {
+				  item.style.display = 'none'
+			  });
+		  }
+
+		  function showAllSlide(i = 1) {
+			  document.querySelector('#current').textContent = `0${i+1}`;
+			  slideContent.forEach( (item, i) => {
+				  item[i].style.display = 'block'
+			  });
+		  }
 	//Timer
 
-	const deadline = new Date('2022-06-02')
+	const deadline = new Date('2022-05-12')
 
-	function checkTime(deadline) {
+	function checkTime(d) {
 		const t = deadline - new Date(),
 			  day = Math.floor(t / (1000 * 60 * 60 * 24)),
 			  hour = Math.floor((t / (1000 * 60 * 60) % 24)),
@@ -60,10 +78,10 @@ window.addEventListener('DOMContentLoaded', () => {
 			return `0${num}`;
 		} else {
 			return num;
-		}
+		} 
 	}
 
-	function setTimer(selector, deadline) {
+	function setTimer(selector, d) {
 		const timer = document.querySelector(selector),
 			  days = timer.querySelector('#days'),
 			  hours = timer.querySelector('#hours'),
@@ -74,18 +92,54 @@ window.addEventListener('DOMContentLoaded', () => {
 		updateClock();
 
 		function updateClock() {
-			const t = checkTime(deadline);
+			const t = checkTime(d);
 
 			days.innerHTML =  zeroNumber(t.d);
 			hours.innerHTML = zeroNumber(t.h);
 			minuts.innerHTML = zeroNumber(t.m);
 			seconds.innerHTML = zeroNumber(t.s);
 
-			if (t.total <= 0) {
+			if (t.time <= 0) {
+				document.querySelector('#end').textContent = `Акция закончилася ${(+-t.d)} дня назад`;
 				clearInterval(timeInterval);
+				days.innerHTML =  '0';
+				hours.innerHTML = '0';
+				minuts.innerHTML = '0';
+				seconds.innerHTML = '0';
 			}
 		}
 	}
 
 	setTimer('.timer', deadline);
+
+	//Modal
+
+	const modalTrigger = document.querySelectorAll('[data-modal]'),
+		  modal = document.querySelector('.modal'),
+		  modalClose = document.querySelector('[data-close]');
+
+	modalTrigger.forEach(item => {
+		item.addEventListener('click', () => {
+			modal.style.display = 'block';
+			document.body.style.overflow = 'hidden';
+		})
+	})
+
+	function closeModalContent () {
+		modal.style.display = 'none';
+		document.body.style.overflow = '';
+	}
+	modalClose.addEventListener('click', closeModalContent);
+
+	modal.addEventListener('click', (event) => {
+		if (event.target === modal ) {
+			closeModalContent();
+		}
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if (e.code === 'Escape' && modal.style.display === 'block') {
+			closeModalContent();
+		}
+	});
 });
