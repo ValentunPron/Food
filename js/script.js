@@ -55,7 +55,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		  }
 	//Timer
 
-	const deadline = new Date('2022-05-12')
+	const deadline = new Date('2022-06-12')
 
 	function checkTime(d) {
 		const t = deadline - new Date(),
@@ -118,17 +118,21 @@ window.addEventListener('DOMContentLoaded', () => {
 		  modal = document.querySelector('.modal'),
 		  modalClose = document.querySelector('[data-close]');
 
-	modalTrigger.forEach(item => {
-		item.addEventListener('click', () => {
-			modal.style.display = 'block';
-			document.body.style.overflow = 'hidden';
-		})
-	})
+	function openModalContent () {
+		modal.style.display = 'block';
+		document.body.style.overflow = 'hidden';
+		clearInterval(modalTimerID);
+	}
 
 	function closeModalContent () {
 		modal.style.display = 'none';
 		document.body.style.overflow = '';
 	}
+
+	modalTrigger.forEach(item => {
+		item.addEventListener('click', openModalContent)
+	})
+
 	modalClose.addEventListener('click', closeModalContent);
 
 	modal.addEventListener('click', (event) => {
@@ -142,4 +146,14 @@ window.addEventListener('DOMContentLoaded', () => {
 			closeModalContent();
 		}
 	});
+
+	const modalTimerID = setTimeout(openModalContent, 30000)
+
+	function showModalByScroll() {
+		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+			openModalContent();
+			window.removeEventListener('scroll', showAllSlide);
+		}
+	}
+	window.addEventListener('scroll', showAllSlide);
 });
