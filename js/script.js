@@ -34,25 +34,46 @@ window.addEventListener('DOMContentLoaded', () => {
 			});
 		}
 	});
-	//Tabs 2.0
+	//Shop
 
-	const slideContent = document.querySelectorAll(".offer__slide"),
-	      slideParent = document.querySelector('.offer__slider-wrapper'),
-	      nextSlide = document.querySelector('.offer__slider-next'),
-		  prevSlide = document.querySelector('.offer__slider-prev');
+	class BannerMenu {
+		constructor (src, alt, subTitle, info, cost, parentSelector) {
+			this.src = src;
+			this.alt = alt;
+			this.subTitle = subTitle;
+			this.parent = document.querySelector(parentSelector);
+			this.info = info;
+			this.cost = cost;
+		}
 
-		  function hideAllSlide() {
-			  slideContent.forEach(item => {
-				  item.style.display = 'none'
-			  });
-		  }
+		addBanner() {
+			const element = document.createElement('div');
+			element.innerHTML = `
+			<div class="menu__item">
+			   <img src="${this.src}" alt="${this.alt}">
+			   <h3 class="menu__item-subtitle">Меню "${this.subTitle}"</h3>
+			   <div class="menu__item-descr">${this.info}</div>
+			   <div class="menu__item-divider"></div>
+			   <div class="menu__item-price">
+			      <div class="menu__item-cost">Цена:</div>
+			      <div class="menu__item-total"><span>${this.cost}</span> грн/день</div>
+			   </div>
+		  </div>
+		`;
+		this.parent.append(element);
+		}
+	}
 
-		  function showAllSlide(i = 1) {
-			  document.querySelector('#current').textContent = `0${i+1}`;
-			  slideContent.forEach( (item, i) => {
-				  item[i].style.display = 'block'
-			  });
-		  }
+	new BannerMenu(
+		'img/tabs/post.jpg', 
+		'post',  
+		'Постное', 
+		`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие
+		продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное
+		количество белков за счет тофу и импортных вегетарианских стейков.`, 
+		'199.49',
+		'.menu .container'
+	).addBanner();
 	//Timer
 
 	const deadline = new Date('2022-06-12')
