@@ -37,10 +37,11 @@ window.addEventListener('DOMContentLoaded', () => {
 	//Shop
 
 	class BannerMenu {
-		constructor (src, alt, subTitle, info, cost, parentSelector) {
+		constructor (src, alt, subTitle, info, cost, parentSelector, ...classes) {
 			this.src = src;
 			this.alt = alt;
 			this.subTitle = subTitle;
+			this.classes = classes
 			this.parent = document.querySelector(parentSelector);
 			this.info = info;
 			this.cost = cost;
@@ -48,8 +49,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 		addBanner() {
 			const element = document.createElement('div');
+			this.classes.forEach(className => element.classList.add(className));
 			element.innerHTML = `
-			<div class="menu__item">
 			   <img src="${this.src}" alt="${this.alt}">
 			   <h3 class="menu__item-subtitle">Меню "${this.subTitle}"</h3>
 			   <div class="menu__item-descr">${this.info}</div>
@@ -58,7 +59,6 @@ window.addEventListener('DOMContentLoaded', () => {
 			      <div class="menu__item-cost">Цена:</div>
 			      <div class="menu__item-total"><span>${this.cost}</span> грн/день</div>
 			   </div>
-		  </div>
 		`;
 		this.parent.append(element);
 		}
@@ -71,8 +71,11 @@ window.addEventListener('DOMContentLoaded', () => {
 		`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие
 		продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное
 		количество белков за счет тофу и импортных вегетарианских стейков.`, 
-		'199.49',
-		'.menu .container'
+		199.49,
+		'.menu .container',
+		'menu__item',
+		'big',
+		'hits__item'
 	).addBanner();
 	//Timer
 
@@ -136,8 +139,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	//Modal
 
 	const modalTrigger = document.querySelectorAll('[data-modal]'),
-		  modal = document.querySelector('.modal'),
-		  modalClose = document.querySelector('[data-close]');
+		  modal = document.querySelector('.modal');
 
 	function openModalContent () {
 		modal.style.display = 'block';
@@ -154,10 +156,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		item.addEventListener('click', openModalContent)
 	})
 
-	modalClose.addEventListener('click', closeModalContent);
-
 	modal.addEventListener('click', (event) => {
-		if (event.target === modal ) {
+		if (event.target === modal || event.target.getAttribute('data-close') == '') {
 			closeModalContent();
 		}
 	});
@@ -173,8 +173,82 @@ window.addEventListener('DOMContentLoaded', () => {
 	function showModalByScroll() {
 		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
 			openModalContent();
-			window.removeEventListener('scroll', showAllSlide);
+			window.removeEventListener('scroll', closeModalContent);
 		}
 	}
-	window.addEventListener('scroll', showAllSlide);
+	window.addEventListener('scroll', closeModalContent);
+
+	// tell Me
+
+	const forms = document.querySelectorAll('form');
+
+	const message = {
+		loading: 'img/form/spinner.svg',
+		success: 'Спасибо! Скоро мы с вами свяжемся',
+		failure: 'Что-по пошло не так...'
+	};
+
+	forms.forEach(item => {
+
+		postData(item);
+	});
+
+	function postData(form) {
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			const statusMessage = document.createElement('div');
+			statusMessage.src = message.loading;
+			statusMessage.textContent = message.loading;
+			form.append(statusMessage);
+
+			const formData = new FormData(form);
+
+			const object = {};
+			formData.forEach(function(value, key){
+				object[key] = value;
+			})
+
+			fetch('server.php', {
+				method: "POST",
+				headers: {
+					'Content-type': 'application/json'
+				},
+				body: JSON.stringify(object)
+			})
+			.then(data => data.text())
+			.then(data => {
+				showThanksModal(message.success);
+				statusMessage.remove();
+			}).catch( () => {
+				showThanksModal(message.failure);
+			}).finally(() => {
+				form.reset();
+			})
+		});
+	}
+
+	function showThanksModal(message) {
+		const prevModalDialog = document.querySelector('.modal__dialog');
+		prevModalDialog.classList.add('hide');
+		openModalContent();
+
+		const thanksModal = document.createElement('div');
+		thanksModal.classList.add('modal__dialog');
+		thanksModal.innerHTML = `
+			<div class="modal__content"> 
+				<div class="modal__close data-close">x</div>
+				<div class="modal__title">${message}</div>
+			</div>
+		`;
+
+		document.querySelector('.modal').append(thanksModal);
+
+		setTimeout(() => {
+			thanksModal.remove();
+			prevModalDialog.classList.add('show');
+			prevModalDialog.classList.remove('hide');
+			closeModalContent();
+		}, 4000);
+	}
 });
