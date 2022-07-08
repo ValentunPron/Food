@@ -251,4 +251,5 @@ window.addEventListener('DOMContentLoaded', () => {
 			closeModalContent();
 		}, 4000);
 	}
-});
+
+})
