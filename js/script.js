@@ -49,6 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 		addBanner() {
 			const element = document.createElement('div');
+			element.classList.add('menu__item');
 			this.classes.forEach(className => element.classList.add(className));
 			element.innerHTML = `
 			   <img src="${this.src}" alt="${this.alt}">
@@ -63,20 +64,20 @@ window.addEventListener('DOMContentLoaded', () => {
 		this.parent.append(element);
 		}
 	}
+	const getResourse = async(url) => {
+		const res = await fetch(url);
 
-	new BannerMenu(
-		'img/tabs/post.jpg', 
-		'post',  
-		'Постное', 
-		`Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие
-		продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное
-		количество белков за счет тофу и импортных вегетарианских стейков.`, 
-		199.49,
-		'.menu .container',
-		'menu__item',
-		'big',
-		'hits__item'
-	).addBanner();
+		if (!res.ok) {
+			throw new Error(`Could not fetch ${url}, status ${res.status}`);
+		}
+		return await res.json();
+	};
+	axios.get('http://localhost:3000/menu')
+		.then(data => {
+			data.data.forEach(({img, altimg, title, descr, price}) => {
+				new BannerMenu(img, altimg, title, descr, price, '.menu .container').addBanner();
+			}); 
+		});
 	//Timer
 
 	const deadline = new Date('2022-06-12')
@@ -180,50 +181,57 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// tell Me
 
-	const forms = document.querySelectorAll('form');
+	const forms = document.querySelectorAll('form'); // виділяємо всі форми, які находяться в хмтл
 
 	const message = {
 		loading: 'img/form/spinner.svg',
 		success: 'Спасибо! Скоро мы с вами свяжемся',
 		failure: 'Что-по пошло не так...'
-	};
+	}; // Об'єкт з можливими повідомленнями
 
 	forms.forEach(item => {
+		bindPostData(item); // Функція яка бере наші дані, і відправляє їх до сервера. 
+	}); // Обробляє всі форми, які у нас є
 
-		postData(item);
-	});
+	const postData = async(url, data) => {
+		const res = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: data
+		});
 
-	function postData(form) {
+		return await res.json();
+	};
+
+	function bindPostData(form) { 
 		form.addEventListener('submit', (event) => {
-			event.preventDefault();
+			event.preventDefault(); // Збиває всі настройки кнопки або силки
 
-			const statusMessage = document.createElement('div');
-			statusMessage.src = message.loading;
-			statusMessage.textContent = message.loading;
-			form.append(statusMessage);
+			const statusMessage = document.createElement('div'); // створюємо блок div
+			statusMessage.src = message.loading; // 
+			statusMessage.textContent = message.loading; // Відображає повідомлення загрузки.
+			form.append(statusMessage); // добавляє в нашу форму повідомлення 
 
-			const formData = new FormData(form);
+			const formData = new FormData(form); // присвуюємо перімінну formData до баз данних
 
-			const object = {};
+			const json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+			const object = {}; // пустий об'єкт. Потрібен буде для заповнення данних
 			formData.forEach(function(value, key){
 				object[key] = value;
-			})
+			}) // перебираємо всі варіанти баз данних 
+			 postData('http://localhost:3000/requests', json)
 
-			fetch('server.php', {
-				method: "POST",
-				headers: {
-					'Content-type': 'application/json'
-				},
-				body: JSON.stringify(object)
-			})
-			.then(data => data.text())
 			.then(data => {
-				showThanksModal(message.success);
-				statusMessage.remove();
+				console.log(data)
+				showThanksModal(message.success); // Добавляє допоміжне помідомлення
+				statusMessage.remove(); // Видаляє допоміжне повідомлення 
 			}).catch( () => {
-				showThanksModal(message.failure);
+				showThanksModal(message.failure); // При якісь помилці повідомляє користувача. Находить помилку задопомогою .catch
 			}).finally(() => {
-				form.reset();
+				form.reset(); // За допомогою .finally, буде виконуватти завжди в кінці, незалежно чи код пішов правельно чи ні
 			})
 		});
 	}
@@ -252,4 +260,41 @@ window.addEventListener('DOMContentLoaded', () => {
 		}, 4000);
 	}
 
+	// slider 
+
+	const sliderParent = document.querySelector('.offer__slider-counter'),
+		  slideNumber = document.querySelector('#current'),
+		  slideBlock = document.querySelector('.offer__slider-wrapper'),
+		  slideItem = document.querySelectorAll('.offer__slide');
+
+	function slideHide() {
+		slideItem.forEach(i => {
+			i.classList.add('hide');
+		})
+	}
+
+	function slideShow(n = 2) {
+		slideItem[n].classList.remove('hide');
+		slideNumber.innerHTML = `0${n+1}`;
+	}
+
+	slideHide();
+	slideShow();
+	let n = 2;
+	sliderParent.addEventListener('click', (event) => {
+		const target = event.target;
+		if ((target && target.classList.contains('offer__slider-prev')) || (target.classList.contains('offer__slider-prev').tagName === "IMG")){
+			if(n != 0) {
+				n--;
+				slideHide();
+				slideShow(n);
+			}
+		} else if ((target && target.classList.contains('offer__slider-next')) || (target.classList.contains('offer__slider-next').tagName === "IMG")) {
+			if(n != 3){
+				n++;
+				slideHide();
+				slideShow(n);
+			}
+		}
+	});
 })
