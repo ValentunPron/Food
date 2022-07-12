@@ -24,9 +24,6 @@
   ],
   "requests": [
     {
-      "name": "fsa",
-      "phone": "fsa",
-      "id": 1
     }
   ]
 }
