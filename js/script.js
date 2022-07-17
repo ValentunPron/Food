@@ -401,24 +401,24 @@ window.addEventListener('DOMContentLoaded', () => {
 	
 	//Calc
 
-	const result = document.querySelector('.calculating__result span');
+	const result = document.querySelector('.calculating__result span'); // Вікно результату
 
-	let sex,height, weight, age, ratio;
+	let sex,height, weight, age, ratio; // Перемінні які будуть використовуватися 
 
 	if (localStorage.getItem('sex')) {
-		let sex = localStorage.getItem('sex');
+		let sex = localStorage.getItem('sex'); // Визначаємо стать, якщо стать зазначенна в локальному сервері, то вибираємо її
 	} else {
-		sex = 'female';
-		localStorage.setItem('sex', 'female');
+		sex = 'female'; 
+		localStorage.setItem('sex', 'female'); // Якщо не зазначено, то кладемо автоматично, що це жіноча стать
 	}
 	if (localStorage.getItem('ratio')) {
-		let ratio = localStorage.getItem('ratio');
+		let ratio = localStorage.getItem('ratio'); // Визначаємо нагрузку, якщо нагрузка зазначенна в локальному сервері, то вибираємо її
 	} else {
 		ratio = 1.375;
-		localStorage.setItem('ratio', 1.375);
+		localStorage.setItem('ratio', 1.375); // Якщо не зазначено, то кладемо автоматично, що це 1.375 нагрузка
 	}
 
-	function initLocalSetting(selector, activeClass) {
+	function initLocalSetting(selector, activeClass) { // Функція яка активує, те що ви нажали 
 		const elements = document.querySelectorAll(selector);
 		
 		elements.forEach(element => {
@@ -433,19 +433,19 @@ window.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
-	function calcTotal() {
-		if (!sex || !height || !weight || !age || !ratio) {
+	function calcTotal() { // Калькулятор який визначає за формулов 
+		if (!sex || !height || !weight || !age || !ratio) { // Якщо немає всіх перемінних, то вибиває текст який зазначений в цій умові
 			result.textContent = 'Введите все данные ___';
 			return;
 		}
 
-		if (sex === 'female') {
+		if (sex === 'female') { // Якщо у вас жіноча стать, то програма рахує за цею формолою
 			result.textContent = Math.round((47.6 + (9.2* weight) + (3.1 * height) - (4.3 * age)) * ratio);
-		} else {
+		} else { // А якщо у вас чоловіча, а точніше не жіноча, то розраховує за цею формолою
 			result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
 		}
 	}
-	function getStaticInfo(parentSelector, activeClass) {
+	function getStaticInfo(parentSelector, activeClass) { //  Полочумаємо інфомрацію, про стать і активність 
 		const element = document.querySelectorAll(`${parentSelector} div`);
 
 		element.forEach(elem => {
@@ -468,12 +468,12 @@ window.addEventListener('DOMContentLoaded', () => {
 		})
 	}
 
-	function getDynamicInfo(selector) {
+	function getDynamicInfo(selector) { // Получаємо інформацію про ріст, вагу, рік
 		const input = document.querySelector(selector);
 
 		input.addEventListener('input', (e) => {
 
-			if(input.value.match(/\D/g)) {
+			if(input.value.match(/\D/g)) { // Якщо буде введено не цифру, то буде підсіченне червоне вікно, як розумію собою, що користувач допустив помилку
 				input.style.border = '1px solid red';
 			} else {
 				input.style.border = `none`;
@@ -492,7 +492,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			calcTotal();	
 		});
 	}
-
+	//Всі функції які заносять данні 
 	getDynamicInfo('#height');
 	getDynamicInfo('#weight');
 	getDynamicInfo('#age');
