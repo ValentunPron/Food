@@ -1,5 +1,8 @@
-function tellMe() {
-	const forms = document.querySelectorAll('form'); // виділяємо всі форми, які находяться в хмтл
+import {closeModalContent, openModalContent} from './modal';
+import {postData} from '../services/services'
+
+function tellMe(formSelector ,modalTimerID) {
+	const forms = document.querySelectorAll(formSelector); // виділяємо всі форми, які находяться в хмтл
 
 	const message = {
 		loading: 'img/form/spinner.svg',
@@ -10,18 +13,6 @@ function tellMe() {
 	forms.forEach(item => {
 		bindPostData(item); // Функція яка бере наші дані, і відправляє їх до сервера. 
 	}); // Обробляє всі форми, які у нас є
-
-	const postData = async(url, data) => {
-		const res = await fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: data
-		});
-
-		return await res.json();
-	};
 
 	function bindPostData(form) { 
 		form.addEventListener('submit', (event) => {
@@ -57,7 +48,7 @@ function tellMe() {
 	function showThanksModal(message) {
 		const prevModalDialog = document.querySelector('.modal__dialog');
 		prevModalDialog.classList.add('hide');
-		openModalContent();
+		openModalContent('.modal', modalTimerID);
 
 		const thanksModal = document.createElement('div');
 		thanksModal.classList.add('modal__dialog');
@@ -74,9 +65,9 @@ function tellMe() {
 			thanksModal.remove();
 			prevModalDialog.classList.add('show');
 			prevModalDialog.classList.remove('hide');
-			closeModalContent();
+			closeModalContent('.modal');
 		}, 4000);
 	}
 }
 
-module.exports = tellMe;
+export default tellMe;

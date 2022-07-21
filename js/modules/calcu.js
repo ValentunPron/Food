@@ -100,4 +100,4 @@ function calcu() {
 	getStaticInfo('.calculating__choose_big', 'calculating__choose-item_active')
 }
 
-module.exports = calcu;
+export default calcu;

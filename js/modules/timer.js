@@ -1,5 +1,5 @@
 function timer() {
-	const deadline = new Date('2022-06-12')
+	const deadline = new Date('2023-02-24')
 
 	function checkTime(d) {
 		const t = deadline - new Date(),
@@ -57,4 +57,4 @@ function timer() {
 	setTimer('.timer', deadline);
 }
 
-module.exports = timer;
+export default timer;
