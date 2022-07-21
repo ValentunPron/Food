@@ -1,8 +1,6 @@
-function timer() {
-	const deadline = new Date('2023-02-24')
-
+function timer(id, deadline) {
 	function checkTime(d) {
-		const t = deadline - new Date(),
+	 	const t = deadline - new Date(),
 			  day = Math.floor(t / (1000 * 60 * 60 * 24)),
 			  hour = Math.floor((t / (1000 * 60 * 60) % 24)),
 			  minut = Math.floor((t / 1000 /60) % 60),

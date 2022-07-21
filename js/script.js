@@ -16,6 +16,5 @@ window.addEventListener('DOMContentLoaded', () => {
 	cards()
 	slider();
 	tellMe('.form', modalTimerID);
-	timer('.timer', '2023-02-24');
-	
+	timer('.timer', '2023-02-24');npm install --save-dev @babel/
 });
